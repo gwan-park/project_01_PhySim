@@ -8,6 +8,7 @@
 - 리포트 스키마: `schemas/report.schema.json`
 - 에이전트별 프롬프트: `prompts/starter_prompts.md`
 - OpenRouter 실행기: `autonomous_physics_workflow.py`
+- Obsidian 요약본: `docs/obsidian/phy_sim_workflow_summary_for_obsidian.md`
 
 ## 빠른 실행
 ```bash
