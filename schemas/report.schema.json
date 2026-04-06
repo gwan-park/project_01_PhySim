@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://physim.local/schemas/report.schema.json",
+  "title": "SimulationReport",
+  "type": "object",
+  "required": [
+    "summary",
+    "problem_definition",
+    "solution_concept",
+    "physics_and_equations",
+    "boundary_conditions",
+    "result_meaning",
+    "sensitivity_and_performance",
+    "next_recommendations"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "summary": { "type": "string" },
+    "problem_definition": { "type": "string" },
+    "solution_concept": { "type": "string" },
+    "physics_and_equations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["concept", "equation_latex"],
+        "properties": {
+          "concept": { "type": "string" },
+          "equation_latex": { "type": "string" },
+          "interpretation": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "boundary_conditions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["region", "type", "value"],
+        "properties": {
+          "region": { "type": "string" },
+          "type": { "type": "string" },
+          "value": { "type": "string" },
+          "role": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "result_meaning": {
+      "type": "object",
+      "required": ["key_findings", "physical_implication", "limitations"],
+      "properties": {
+        "key_findings": { "type": "array", "items": { "type": "string" } },
+        "physical_implication": { "type": "string" },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "sensitivity_and_performance": {
+      "type": "object",
+      "required": ["sensitive_parameters", "numerical_stability", "runtime_notes"],
+      "properties": {
+        "sensitive_parameters": { "type": "array", "items": { "type": "string" } },
+        "numerical_stability": { "type": "string" },
+        "runtime_notes": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "next_recommendations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title", "reason"],
+        "properties": {
+          "title": { "type": "string" },
+          "reason": { "type": "string" },
+          "expected_outcome": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}
