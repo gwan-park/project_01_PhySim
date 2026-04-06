@@ -1,0 +1,238 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://physim.local/schemas/simulation_spec.schema.json",
+  "title": "SimulationSpec",
+  "description": "Natural-language-driven physical simulation execution contract for multi-agent orchestration.",
+  "type": "object",
+  "required": [
+    "meta",
+    "problem",
+    "modeling",
+    "numerics",
+    "execution",
+    "outputs"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["request_id", "created_at", "created_by", "language"],
+      "additionalProperties": false,
+      "properties": {
+        "request_id": { "type": "string", "minLength": 4 },
+        "created_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string" },
+        "language": { "type": "string", "enum": ["ko", "en", "ja", "zh"] },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        }
+      }
+    },
+    "problem": {
+      "type": "object",
+      "required": ["goal", "domain", "question", "assumptions"],
+      "additionalProperties": false,
+      "properties": {
+        "goal": { "type": "string", "minLength": 8 },
+        "domain": {
+          "type": "string",
+          "enum": [
+            "dft",
+            "md",
+            "dft_md_hybrid",
+            "electro_thermal_pde",
+            "switching_device",
+            "custom_pde"
+          ]
+        },
+        "question": { "type": "string" },
+        "assumptions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "acceptance_criteria": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        }
+      }
+    },
+    "materials": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "system_type": {
+          "type": "string",
+          "enum": ["atom", "molecule", "bulk", "surface", "device", "unknown"],
+          "default": "unknown"
+        },
+        "composition": { "type": "string" },
+        "structure_source": {
+          "type": "string",
+          "description": "e.g. CIF file path, Materials Project ID"
+        },
+        "defects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["vacancy", "interstitial", "substitutional", "dislocation", "filament", "custom"]
+              },
+              "description": { "type": "string" },
+              "concentration": { "type": "number", "minimum": 0 }
+            },
+            "additionalProperties": false
+          },
+          "default": []
+        }
+      }
+    },
+    "modeling": {
+      "type": "object",
+      "required": ["physics_concepts", "governing_equations"],
+      "additionalProperties": false,
+      "properties": {
+        "physics_concepts": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "governing_equations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name", "equation_latex"],
+            "properties": {
+              "name": { "type": "string" },
+              "equation_latex": { "type": "string" },
+              "notes": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "boundary_conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["region", "type", "value"],
+            "properties": {
+              "region": { "type": "string" },
+              "type": { "type": "string", "enum": ["Dirichlet", "Neumann", "Robin", "Periodic", "Mixed"] },
+              "value": { "type": "string" }
+            },
+            "additionalProperties": false
+          },
+          "default": []
+        },
+        "initial_conditions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        }
+      }
+    },
+    "numerics": {
+      "type": "object",
+      "required": ["solver_type", "time_regime", "tolerances"],
+      "additionalProperties": false,
+      "properties": {
+        "solver_type": { "type": "string", "enum": ["DFT", "MD", "FEM", "FDM", "hybrid"] },
+        "time_regime": { "type": "string", "enum": ["steady", "transient"] },
+        "mesh": {
+          "type": "object",
+          "properties": {
+            "strategy": { "type": "string" },
+            "resolution": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "time_step": { "type": "number", "exclusiveMinimum": 0 },
+        "total_time": { "type": "number", "exclusiveMinimum": 0 },
+        "tolerances": {
+          "type": "object",
+          "required": ["abs", "rel"],
+          "properties": {
+            "abs": { "type": "number", "exclusiveMinimum": 0 },
+            "rel": { "type": "number", "exclusiveMinimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "convergence_checks": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "required": ["tools", "runtime", "auto_retry"],
+      "additionalProperties": false,
+      "properties": {
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["ase", "gpaw", "fenicsx", "pytorch", "lammps", "custom"]
+          }
+        },
+        "runtime": {
+          "type": "object",
+          "required": ["environment", "max_walltime_min"],
+          "properties": {
+            "environment": { "type": "string", "enum": ["local", "docker", "slurm", "k8s"] },
+            "gpu": { "type": "boolean", "default": false },
+            "max_walltime_min": { "type": "integer", "minimum": 1 }
+          },
+          "additionalProperties": false
+        },
+        "auto_retry": {
+          "type": "object",
+          "required": ["max_attempts", "repair_strategy"],
+          "properties": {
+            "max_attempts": { "type": "integer", "minimum": 0, "maximum": 10 },
+            "repair_strategy": { "type": "string", "enum": ["prompt_patch", "code_patch", "parameter_tuning", "none"] }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "required": ["artifacts", "report_sections"],
+      "additionalProperties": false,
+      "properties": {
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["logs", "plots", "trajectory", "checkpoint", "table_csv", "json_summary"]
+          }
+        },
+        "report_sections": {
+          "type": "array",
+          "minItems": 7,
+          "items": {
+            "type": "string",
+            "enum": [
+              "problem_definition",
+              "solution_concept",
+              "physics_and_equations",
+              "boundary_conditions",
+              "result_meaning",
+              "sensitivity_and_performance",
+              "next_recommendations"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
