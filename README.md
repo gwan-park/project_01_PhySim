@@ -19,3 +19,10 @@ python3 autonomous_physics_workflow.py --task "Simulate ion-crystal interaction 
 ## 참고
 - 스크립트는 OpenRouter를 통해 역할별 모델(clarifier/planner/coder/debugger/scaler/reviewer)을 호출합니다.
 - 검증(저비용) → 디버그 반복 → 생산(고충실도) → 보고서 생성 순으로 동작합니다.
+
+
+## 체크포인트/재개
+```bash
+python3 autonomous_physics_workflow.py --resume-from checkpoints/<run_id>.json --auto-confirm
+```
+- `spec`, `plan`, `verify_code`, `production_code`, `report_json`를 단계별 체크포인트로 저장하고 재개할 수 있습니다.
