@@ -31,7 +31,6 @@ Rules:
 1) Follow the schema strictly.
 2) Never invent high-risk parameters; put them in assumptions.
 3) Include report_sections with 7 mandatory sections.
-4) Use Korean language output in descriptive text.
 
 Inputs:
 - Raw input: {raw_input}
