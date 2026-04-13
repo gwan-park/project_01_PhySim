@@ -16,15 +16,15 @@ import requests
 
 @dataclass
 class WorkflowConfig:
-    openrouter_api_key: str = field(default_factory=lambda: os.getenv("OPENROUTER_API_KEY", ""))
+    MY_API_KEY_OpenRouter: str = field(default_factory=lambda: os.getenv("MY_API_KEY_OpenRouter", ""))
     model_map: Dict[str, str] = field(
         default_factory=lambda: {
-            "clarifier": "anthropic/claude-3-haiku",
-            "planner": "openai/gpt-4o",
-            "coder": "deepseek/deepseek-coder",
-            "debugger": "anthropic/claude-3.5-sonnet",
-            "scaler": "openai/gpt-4o",
-            "reviewer": "openai/gpt-4o",
+            "clarifier": "openai/gpt-5.4-mini",
+            "planner": "anthropic/claude-opus-4.6",
+            "coder": "anthropic/claude-sonnet-4.6",
+            "debugger": "openai/gpt-5.4",
+            "scaler": "openai/gpt-5.4-mini",
+            "reviewer": "openai/gpt-5.4",
         }
     )
     max_debug_iter: int = 5
@@ -144,7 +144,7 @@ class AutonomousPhysicsWorkflow:
     def call_llm(self, role: str, prompt: str, temperature: float = 0.2) -> Optional[str]:
         if role not in self.cfg.model_map:
             raise ValueError(f"Unknown role: {role}")
-        if not self.cfg.openrouter_api_key:
+        if not self.cfg.MY_API_KEY_OpenRouter:
             return None
 
         prompt = self.tail_truncate(prompt, self.cfg.max_prompt_chars, label=f"prompt:{role}")
@@ -156,7 +156,7 @@ class AutonomousPhysicsWorkflow:
             "temperature": temperature,
         }
         headers = {
-            "Authorization": f"Bearer {self.cfg.openrouter_api_key}",
+            "Authorization": f"Bearer {self.cfg.MY_API_KEY_OpenRouter}",
             "Content-Type": "application/json",
             "X-Title": self.cfg.app_name,
         }
@@ -229,8 +229,8 @@ class AutonomousPhysicsWorkflow:
                 "OPENBLAS_NUM_THREADS": "1",
                 "MKL_NUM_THREADS": "1",
             }
-            if "OPENROUTER_API_KEY" in os.environ:
-                safe_env["OPENROUTER_API_KEY"] = os.environ["OPENROUTER_API_KEY"]
+            if "MY_API_KEY_OpenRouter" in os.environ:
+                safe_env["MY_API_KEY_OpenRouter"] = os.environ["MY_API_KEY_OpenRouter"]
 
             try:
                 result = subprocess.run(
@@ -699,9 +699,9 @@ def main() -> None:
     cfg = WorkflowConfig()
     workflow = AutonomousPhysicsWorkflow(cfg)
 
-    if not cfg.openrouter_api_key:
-        print("⚠️ OPENROUTER_API_KEY is not set. Set environment variable before running:")
-        print("   export OPENROUTER_API_KEY='your_api_key_here'")
+    if not cfg.MY_API_KEY_OpenRouter:
+        print("⚠️ MY_API_KEY_OpenRouter is not set. Set environment variable before running:")
+        print("   export MY_API_KEY_OpenRouter='your_api_key_here'")
         return
 
     print("=== Autonomous Physics Research System (OpenRouter OOP) ===")
