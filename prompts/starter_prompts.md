@@ -140,18 +140,17 @@ Return JSON:
 ## 7) Report Agent Prompt (7 sections fixed)
 
 ```text
-Write a final simulation report in Korean.
+Write a final simulation report in academic english.
 Must include exactly these sections:
-1) 문제 정의와 목표
-2) 해결 컨셉
-3) 물리 개념과 수식
-4) 경계조건/초기조건
-5) 시뮬레이션 결과의 물리적 의미
-6) 민감도/수치 성능 고려사항
-7) 다음 시뮬레이션 추천
+1) clarified problem and objective explanation
+2) solving concept
+3) physics background theory and equation to solve problems
+4) initial condition and boundary condition
+5) physical meaning and explanation of simulation result
+6) sensitivity and calculation step/grid increment consideration
+7) suggested next step
 
 Also include:
-- confidence score
 - limitations
 - reproducibility checklist
 
